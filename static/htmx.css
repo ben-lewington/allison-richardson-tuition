@@ -1,0 +1,2 @@
+main { opacity: 1; transition: opacity 1.5s ease-out; }
+main.htmx-added { opacity: 0; }
