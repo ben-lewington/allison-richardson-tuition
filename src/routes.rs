@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use crate::common::with_common_content;
+use crate::common::{with_common_content, form};
 
 use axum::{http::HeaderMap, response::IntoResponse};
 use maud::{html, Markup};
@@ -12,7 +12,7 @@ pub static ROUTING: Lazy<Route<'static, usize>> = Lazy::new(|| {
         vec![
             Route::Simple(RouteData::new(1, "/about", "About Us")),
             Route::Nested(
-                RouteData::new(2, "/courses", "Available Courses"),
+                RouteData::new(2, "/courses", "Tuition Services"),
                 vec![
                     Route::Simple(RouteData::new(4, "/courses/french", "French")),
                     Route::Simple(RouteData::new(5, "/courses/german", "German")),
@@ -27,20 +27,6 @@ pub struct RouteData<'a, Idx> {
     id: Idx,
     route: &'a str,
     label: &'a str,
-}
-
-impl<'a, Idx> RouteData<'a, Idx>
-where
-    Idx: Display,
-{
-    pub fn render_as(&self, component_type: &str, style: &str) -> Markup {
-        html! {
-            a href=(self.route)
-                .{ (component_type) "-" (self.id) }
-                .(style)
-            { (self.label) }
-        }
-    }
 }
 
 pub enum Route<'a, Idx> {
@@ -58,23 +44,23 @@ impl<'a, Idx> Route<'a, Idx>
 where
     Idx: Display + Default + Eq + Copy,
 {
-    fn sitemap_rec(&self, depth: usize) -> Markup {
+    fn sitemap_rec(&self, depth: usize, route_index: Idx) -> Markup {
         let ml = format!("ml-[{}px]", (depth * 10 * 4).saturating_sub(1));
         html! {
             @match self {
                 Route::Simple(rd) => {
                     li ."list-none border-l border-black ml-3 last:border-transparent" {
-                        (Self::sitemap_span(rd, depth))
+                        (Self::map_icon_with_current(rd, depth, route_index))
                     }
                 }
                 Route::Nested(rd, rs) => {
                     li ."list-none border-l border-black ml-3 last:border-transparent" {
-                        (Self::sitemap_span(rd, depth))
+                        (Self::map_icon_with_current(rd, depth, route_index))
                         ul ."relative list-none"
                             .(ml)
                         {
                            @for r in rs {
-                                (r.sitemap_rec(depth + 1))
+                                (r.sitemap_rec(depth + 1, route_index))
                             }
                         }
                     }
@@ -83,7 +69,7 @@ where
         }
     }
 
-    fn sitemap_span(inner: &RouteData<'_, Idx>, depth: usize) -> Markup {
+    fn map_icon_with_current(inner: &RouteData<'_, Idx>, depth: usize, route_index: Idx) -> Markup {
         html! {
             span ."relative inline-block pt-2 pr-2"
                 .({
@@ -94,26 +80,30 @@ where
                     } else { "" }
                 })
             {
-                (inner.render_as(
-                    "sitemap",
-                    "relative top-[-2px] inline-block p-2 border whitespace-nowrap"
-                ))
+            a href=(inner.route)
+                ."relative top-[-2px] inline-block p-2 border whitespace-nowrap"
+                .({
+                    if inner.id == route_index {
+                        "bg-gray-300 animate-pulse pointer-events-none"
+                    } else {
+                        "hover:transition hover:ease-in hover:duration-500 hover:bg-gray-500 hover:animate-pulse"
+                    }
+                })
+            { (inner.label) }
            }
         }
     }
 
-    pub fn sitemap(&self) -> Markup {
+    pub fn map(&self, route_index: Idx) -> Markup {
         html! {
             ."flex flex-wrap m-4"
-            _ = "on navEvt(value) from body set sitemapPage to 'sitemap-' + value
-                then add @disabled to .{sitemapPage}"
             {
-                (self.sitemap_rec(0))
+                (self.sitemap_rec(0, route_index))
             }
         }
     }
 
-    fn nav_icon_item(inner: &RouteData<'_, Idx>, _depth: usize) -> Markup {
+    fn anchor_icon(inner: &RouteData<'_, Idx>, _depth: usize) -> Markup {
         html! {
               a href=(inner.route) ."block px-4 py-2 border mb-2 bg-gray-300 shadow-xl"
                   ."hover:transition hover:ease-in hover:duration-500 hover:bg-gray-500 hover:animate-pulse"
@@ -121,20 +111,14 @@ where
         }
     }
 
-    fn _nav_list_item(inner: &RouteData<'_, Idx>, depth: usize) -> Markup {
-        html! {
-            a href=(inner.route) ."whitespace-nowrap leading-6 " .(format!("px-{}", (depth - 1) * 4)) { (inner.label) }
-        }
-    }
-
-    fn nav_icon_selectable(inner: &RouteData<'_, Idx>, _depth: usize, current: bool) -> Markup {
+    fn anchor_icon_with_current(inner: &RouteData<'_, Idx>, _depth: usize, route_index: Idx) -> Markup {
         html! {
          a href=(inner.route)
              ."whitespace-nowrap shadow-md ease-in transition duration-300 inline-block mx-2 "
              ."mt-8 px-4 py-2 border min-w-fit max-w-sm "
              .({
-                 if current {
-                     "bg-gray-300 cursor-crosshair animate-pulse"
+                 if route_index == inner.id {
+                     "bg-gray-300 animate-pulse pointer-events-none"
                  } else {
                      "bg-transparent hover:ease-in hover:transition hover:duration-300
                      hover:bg-gray-400 hover:shadow-lg hover:animate-pulse"
@@ -158,13 +142,13 @@ where
                         @match r {
                             Route::Simple(rd) => {
                                 li {
-                                    (Self::nav_icon_selectable(rd, 1, rd.id == selection.unwrap_or(Default::default())))
+                                    (Self::anchor_icon_with_current(rd, 1, selection.unwrap_or(Default::default())))
                                 }
                             }
                             Route::Nested(rd, rs) => {
                                 li ."group relative inline-block bg-transparent"
                                 {
-                                    (Self::nav_icon_selectable(rd, 1, rd.id == selection.unwrap_or(Default::default())))
+                                    (Self::anchor_icon_with_current(rd, 1, selection.unwrap_or(Default::default())))
                                     ul ."absolute bg-transparent m-2 z-10 text-sm"
                                         ."transition-opacity opacity-0 delay-0 "
                                         ."group-hover:opacity-100 group-hover:delay-300"
@@ -183,12 +167,12 @@ where
             @match self {
                 Route::Simple(rd) => {
                     li {
-                    (Self::nav_icon_item(rd, depth))
+                        (Self::anchor_icon(rd, depth))
                     }
                 }
                 Route::Nested(rd, rs) => {
                     li {
-                        (Self::nav_icon_item(rd, depth))
+                        (Self::anchor_icon(rd, depth))
                         ul ."list-none"
                         {
                            @for r in rs {
@@ -203,7 +187,9 @@ where
 
     pub fn nav(&self, current_id: Option<Idx>) -> Markup {
         html! {
-            (self.nav_rec(0, current_id))
+            nav ."flex flex-rows" {
+                (self.nav_rec(0, current_id))
+            }
         }
     }
 }
@@ -272,20 +258,28 @@ pub async fn courses() -> (HeaderMap, Markup) {
     )
 }
 
-pub async fn contact() -> (HeaderMap, Markup) {
+pub async fn contact(headers: HeaderMap) -> (HeaderMap, Markup) {
+
     (
         hx_trigger_response_headers("navEvt", 3),
-        with_common_content(
-            html! {
-                form {
-                    label for="frm_first_name" {
-                        "First Name"
+        if let Some(_) = headers.get("HX-Request") {
+            with_common_content(
+                html! {
+                    section {
+                        (form())
                     }
-                    input #frm_first_name ."rounded-md border my-2" type="text" required {}
-                }
-                a href="/" ."inline-block bg-gray-500 p-5 rounded-md" { "<=" }
-            },
-            3,
-        ),
+                },
+                3
+            )
+        } else {
+            with_common_content(
+                html! {
+                    section {
+                        (form())
+                    }
+                },
+                3
+            )
+        }
     )
 }
