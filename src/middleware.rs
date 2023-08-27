@@ -1,10 +1,3 @@
-use axum:: {
-    async_trait,
-    extract::FromRequestParts,
-    http::{request::Parts, HeaderValue},
-};
-use maud::Markup;
-
 pub struct HtmxRequest {
     request: bool
 }
@@ -43,7 +36,3 @@ pub struct HtmxRequest {
 //
 // request comes in -> routed appropriately -> partial constructed -> if not HX-Request, embed
 // partial in full page
-//
-//
-//
-//

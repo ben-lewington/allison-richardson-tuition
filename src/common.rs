@@ -2,7 +2,7 @@ use maud::{html, Markup, Render, DOCTYPE};
 
 use crate::routes::ROUTING;
 
-fn with_head(body: impl Render) -> Markup {
+fn head(body: impl Render) -> Markup {
     html! {
         (DOCTYPE)
         head {
@@ -20,7 +20,7 @@ fn with_head(body: impl Render) -> Markup {
     }
 }
 
-fn with_wrapper_to_main(
+fn body(
     header: impl Render,
     main: impl Render,
     footer: impl Render,
@@ -69,13 +69,22 @@ pub fn footer(route_index: usize) -> Markup {
     }
 }
 
-pub fn with_common_content(main: impl Render, route_index: usize) -> Markup {
-    with_head(with_wrapper_to_main(
+pub fn standard(main: impl Render, route_index: usize) -> Markup {
+    head(body(
         header(route_index),
         main,
         footer(route_index),
         "",
     ))
+}
+
+pub fn headless(main: impl Render, route_index: usize) -> Markup {
+    body(
+        header(route_index),
+        main,
+        footer(route_index),
+        "",
+    )
 }
 
 
