@@ -70,23 +70,12 @@ pub fn footer(route_index: usize) -> Markup {
 }
 
 pub fn standard(main: impl Render, route_index: usize) -> Markup {
-    head(body(
-        header(route_index),
-        main,
-        footer(route_index),
-        "",
-    ))
+    head(body(header(route_index), main, footer(route_index), ""))
 }
 
 pub fn headless(main: impl Render, route_index: usize) -> Markup {
-    body(
-        header(route_index),
-        main,
-        footer(route_index),
-        "",
-    )
+    body(header(route_index), main, footer(route_index), "")
 }
-
 
 pub fn form() -> Markup {
     html! {
@@ -108,4 +97,3 @@ pub fn form() -> Markup {
         }
     }
 }
-
