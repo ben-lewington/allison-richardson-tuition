@@ -27,8 +27,7 @@ where
                     if self.id == route_index {
                         "bg-gray-300 animate-pulse pointer-events-none"
                     } else {
-                        "hover:transition hover:ease-in hover:duration-500 hover:bg-gray-500
-                        hover:animate-pulse"
+                        "hover:transition hover:ease-in hover:duration-500 hover:bg-gray-500 hover:animate-pulse"
                     }
                 })
             { (self.label) }
@@ -48,7 +47,7 @@ where
     fn anchor_icon_with_current(&self, route_index: Idx) -> Markup {
         html! {
          a href=(self.route)
-             ."whitespace-nowrap shadow-md ease-in transition duration-300 inline-block mx-2 "
+             ."whitespace-nowrap rounded-md shadow-md ease-in transition duration-300 inline-block mx-2 "
              ."mt-8 px-4 py-2 border min-w-fit max-w-sm "
              .({
                  if route_index == self.id {
@@ -73,7 +72,9 @@ where
         html! {
             ."flex flex-wrap m-4"
             {
-                (self.map_rec(0, route_index))
+                ul {
+                    (self.map_rec(0, route_index))
+                }
             }
         }
     }
@@ -83,12 +84,12 @@ where
         html! {
             @match self {
                 Route::Simple(rd) => {
-                    li ."list-none border-l border-black ml-3 last:border-transparent" {
+                    li ."border-l border-black ml-3 last:border-transparent" {
                         (rd.map_icon_with_current(depth, route_index))
                     }
                 }
                 Route::Nested(rd, rs) => {
-                    li ."list-none border-l border-black ml-3 last:border-transparent" {
+                    li ."border-l border-black ml-3 last:border-transparent" {
                         (rd.map_icon_with_current(depth, route_index))
                         ul ."relative list-none"
                             .(ml)
@@ -103,10 +104,10 @@ where
         }
     }
 
-    pub fn nav(&self, current: Option<Idx>) -> Markup {
+    pub fn nav(&self, current: Idx) -> Markup {
         html! {
             nav ."flex flex-rows" {
-                (self.nav_rec(0, current))
+                (self.nav_rec(0, Some(current)))
             }
         }
     }
@@ -131,7 +132,7 @@ where
                                 {
                                     (rd.anchor_icon_with_current(current.unwrap_or(Default::default())))
                                     ul ."absolute bg-transparent m-2 z-10 text-sm"
-                                        ."transition-opacity opacity-0 delay-0 "
+                                        ."transition-opacity opacity-0 delay-0"
                                         ."group-hover:opacity-100 group-hover:delay-300"
                                     {
                                         @for r in rs { (r.nav_rec(1, None)) }

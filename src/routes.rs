@@ -34,347 +34,91 @@ impl<'a, Idx> RouteData<'a, Idx> {
         RouteData { id, route, label }
     }
 }
+            // ."before:bottom-[50%]"
+            // ."before:left-[-1px]"
+            // ."before:content-['']"
+            // ."before:border-l"
+            // ."before:border-b"
+            // ."before:border-black"
+            //
 
-enum LangCode {
-
-}
-
-enum Ltr {
-    LeftToRight,
-    RightToLeft
-}
-
-enum TwPClass {
-    Hover,
-    Focus,
-    FocusWithin,
-    FocusVisible,
-    Active,
-    Visited,
-    Target,
-    First,
-    Last,
-    Only,
-    Odd,
-    Even,
-    FirstOfType,
-    LastOfType,
-    OnlyOfType,
-    Empty,
-    Disabled,
-    Enabled,
-    Checked,
-    Indeterminate,
-    Default,
-    Required,
-    Valid,
-    Invalid,
-    InRange,
-    OutOfRange,
-    PlaceholderShown,
-    Autofill,
-    ReadOnly,
-}
-
-impl TwPClass {
-    fn as_css(&self) -> &'static str {
-        match self {
-            TwPClass::Hover => "hover",
-            TwPClass::Focus => "focus",
-            TwPClass::FocusWithin => "focus-within",
-            TwPClass::FocusVisible => todo!(),
-            TwPClass::Active => todo!(),
-            TwPClass::Visited => todo!(),
-            TwPClass::Target => todo!(),
-            TwPClass::First => todo!(),
-            TwPClass::Last => todo!(),
-            TwPClass::Only => todo!(),
-            TwPClass::Odd => todo!(),
-            TwPClass::Even => todo!(),
-            TwPClass::FirstOfType => todo!(),
-            TwPClass::LastOfType => todo!(),
-            TwPClass::OnlyOfType => todo!(),
-            TwPClass::Empty => todo!(),
-            TwPClass::Disabled => todo!(),
-            TwPClass::Enabled => todo!(),
-            TwPClass::Checked => todo!(),
-            TwPClass::Indeterminate => todo!(),
-            TwPClass::Default => todo!(),
-            TwPClass::Required => todo!(),
-            TwPClass::Valid => todo!(),
-            TwPClass::Invalid => todo!(),
-            TwPClass::InRange => todo!(),
-            TwPClass::OutOfRange => todo!(),
-            TwPClass::PlaceholderShown => todo!(),
-            TwPClass::Autofill => todo!(),
-            TwPClass::ReadOnly => todo!(),
-        }
-    }
-}
-
-struct PseudoClassStyle<'a> {
-    modifier: PseudoClass,
-    style: &'a str,
-}
-
-impl<'a> maud::Render for PseudoClassStyle<'a> {
-    fn render_to(&self, buffer: &mut String) {
-        for style_fragment in self.style.split_whitespace() {
-            buffer.push_str(&format!("a"));
-        }
-    }
-}
-
-fn li(
+fn small_viewport_icon(
     lbl: &'static str,
-    before_style: &'static str,
-    hover_style: &'static str,
+    li_style: &'static str,
+    span_style: &'static str,
+    a_style: &'static str,
+    include: impl maud::Render,
 ) -> Markup {
     html! {
-        li .relative
-            ."pl-4 py-1"
-            ."before:bottom-[50%]"
-            ."before:left-[-1px]"
-            ."before:content-['']"
-            ."before:border-l"
-            ."before:border-b"
-            ."before:border-black"
+        li .(li_style)
+            relative
+            ."pl-4"
+            ."last:border-transparent"
         {
-            span .relative
+            span .(span_style)
+                .relative
                 ."inline-block"
-                ."pt-1 pl-8"
+                ."pl-3"
+                ."border-black"
                 ."before:absolute"
-                ."before:w-8"
+                ."before:w-4"
                 ."before:top-0"
-                ."before:bottom-[50%]"
-                ."before:left-[-1px]"
+                ."before:bottom-[0%]"
+                ."before:left-[-3px]"
                 ."before:content-['']"
                 ."before:border-l"
                 ."before:border-b"
                 ."before:border-black"
             {
                 a href="#"
+                    .(a_style)
+                    .relative
+                    .border-b
+                    .border-black
                     ."relative"
-                    ."top-[-2px]"
                     ."inline-block"
                     ."px-2 py-1"
-                    ."border-b"
                     ."whitespace-nowrap"
                     ."hover:transition"
                     ."hover:ease-in"
                     ."hover:duration-500"
-                    ."hover:bg-gray-500"
+                    ."hover:bg-gray-400"
                     ."hover:animate-pulse"
                 {
                     (lbl)
                 }
             }
+            (include)
         }
     }
 }
+            // ."whitespace-nowrap rounded-md shadow-md ease-in transition duration-300 inline-block mx-2 "
+            // ."mt-8 px-4 py-2 border min-w-fit max-w-sm "
+                                    // ul ."absolute bg-transparent m-2 z-10 text-sm"
+                                    //     ."transition-opacity opacity-0 delay-0"
+                                    //     ."group-hover:opacity-100 group-hover:delay-300"
 
 pub fn small_viewport_nav() -> Markup {
     html! {
-        ."group" {
-            nav ."flex flex-cols block group-hover:block" {
-                ul ."list-none" {
-                    ."px-2 py-1 border group-hover:hidden w-fit " { "Menu" }
-                    li .relative
-                        ."pl-4 py-1"
-                        ."before:bottom-[50%]"
-                        ."before:left-[-1px]"
-                        ."before:content-['']"
-                        ."before:border-l"
-                        ."before:border-b"
-                        ."before:border-black"
-                    {
-                        span .relative
-                            ."inline-block"
-                            ."pt-1 pl-8"
-                            ."before:absolute"
-                            ."before:w-8"
-                            ."before:top-0"
-                            ."before:bottom-[50%]"
-                            ."before:left-[-1px]"
-                            ."before:content-['']"
-                            ."before:border-l"
-                            ."before:border-b"
-                            ."before:border-black"
-                        {
-                            a href="#"
-                                ."relative"
-                                ."top-[-2px]"
-                                ."inline-block"
-                                ."px-2 py-1"
-                                ."border-b"
-                                ."whitespace-nowrap"
-                                ."hover:transition"
-                                ."hover:ease-in"
-                                ."hover:duration-500"
-                                ."hover:bg-gray-500"
-                                ."hover:animate-pulse"
-                            {
-                                "About"
+        ."flex group mr-12 mt-8" {
+            nav ."absolute justify-self-left" {
+                ."" {
+                    ."p-2 rounded-md border group-hover:animate-pulse w-fit " { (crate::svg::menu()) }
+                    ul ."relative z-10"
+                        ."bg-transparent"
+                        ."transition-opacity"
+                        ."opacity-0"
+                        ."delay-0"
+                        ."left-[-3px]"
+                        ."group-hover:opacity-100 group-hover:delay-300"{
+                        (small_viewport_icon("About", "", "", "", ""))
+                        (small_viewport_icon("Tuition Services", "", "", "", html! {
+                            ul ."relative list-none border-l border-black left-[-3px]" {
+                                (small_viewport_icon("French", "", "", "", ""))
+                                (small_viewport_icon("German", "", "", "", ""))
                             }
-                        }
-                    }
-                    li .relative
-                        ."pl-4 py-1"
-                        ."before:bottom-[50%]"
-                        ."before:left-[-1px]"
-                        ."before:content-['']"
-                        ."before:border-l"
-                        ."before:border-b"
-                        ."before:border-black"
-                    {
-                        span .relative
-                            ."inline-block"
-                            ."pt-1 pl-8"
-                            ."before:absolute"
-                            ."before:w-8"
-                            ."before:top-0"
-                            ."before:bottom-[50%]"
-                            ."before:left-[-1px]"
-                            ."before:content-['']"
-                            ."before:border-l"
-                            ."before:border-b"
-                            ."before:border-black"
-                        {
-                            a href="#"
-                                ."relative"
-                                ."top-[-2px]"
-                                ."inline-block"
-                                ."px-2 py-1"
-                                ."border-b"
-                                ."whitespace-nowrap"
-                                ."hover:transition"
-                                ."hover:ease-in"
-                                ."hover:duration-500"
-                                ."hover:bg-gray-500"
-                                ."hover:animate-pulse"
-                            {
-                                "Tuition Services"
-                            }
-                            ul ."list-none"{
-                                li .relative
-                                    ."pl-4 py-1"
-                                    ."before:bottom-[50%]"
-                                    ."before:left-[-1px]"
-                                    ."before:content-['']"
-                                    ."before:border-l"
-                                    ."before:border-b"
-                                    ."before:border-black"
-                                {
-                                    span .relative
-                                        ."inline-block"
-                                        ."pt-1 pl-8"
-                                        ."before:absolute"
-                                        ."before:w-8"
-                                        ."before:top-0"
-                                        ."before:bottom-[50%]"
-                                        ."before:left-[-1px]"
-                                        ."before:content-['']"
-                                        ."before:border-l"
-                                        ."before:border-b"
-                                        ."before:border-black"
-                                    {
-                                        a href="#"
-                                            ."relative"
-                                            ."top-[-2px]"
-                                            ."inline-block"
-                                            ."px-2 py-1"
-                                            ."border-b"
-                                            ."whitespace-nowrap"
-                                            ."hover:transition"
-                                            ."hover:ease-in"
-                                            ."hover:duration-500"
-                                            ."hover:bg-gray-500"
-                                            ."hover:animate-pulse"
-                                        {
-                                            "French"
-                                        }
-                                    }
-                                }
-                                li .relative
-                                    ."pl-4 py-1"
-                                    ."before:bottom-[50%]"
-                                    ."before:left-[-1px]"
-                                    ."before:content-['']"
-                                    ."before:border-l"
-                                    ."before:border-b"
-                                    ."before:border-black"
-                                {
-                                    span .relative
-                                        ."inline-block"
-                                        ."pt-1 pl-8"
-                                        ."before:absolute"
-                                        ."before:w-8"
-                                        ."before:top-0"
-                                        ."before:bottom-[50%]"
-                                        ."before:left-[-1px]"
-                                        ."before:content-['']"
-                                        ."before:border-l"
-                                        ."before:border-b"
-                                        ."before:border-black"
-                                    {
-                                        a href="#"
-                                            ."relative"
-                                            ."top-[-2px]"
-                                            ."inline-block"
-                                            ."px-2 py-1"
-                                            ."border-b"
-                                            ."whitespace-nowrap"
-                                            ."hover:transition"
-                                            ."hover:ease-in"
-                                            ."hover:duration-500"
-                                            ."hover:bg-gray-500"
-                                            ."hover:animate-pulse"
-                                        {
-                                            "German"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    li .relative
-                        ."pl-4 py-1"
-                        ."before:bottom-[50%]"
-                        ."before:left-[-1px]"
-                        ."before:content-['']"
-                        ."before:border-l"
-                        ."before:border-b"
-                        ."before:border-black"
-                    {
-                        span .relative
-                            ."inline-block"
-                            ."pt-1 pl-8"
-                            ."before:absolute"
-                            ."before:w-8"
-                            ."before:top-0"
-                            ."before:bottom-[50%]"
-                            ."before:left-[-1px]"
-                            ."before:content-['']"
-                            ."before:border-l"
-                            ."before:border-b"
-                            ."before:border-black"
-                        {
-                            a href="#"
-                                ."relative"
-                                ."top-[-2px]"
-                                ."inline-block"
-                                ."px-2 py-1"
-                                ."border-b"
-                                ."whitespace-nowrap"
-                                ."hover:transition"
-                                ."hover:ease-in"
-                                ."hover:duration-500"
-                                ."hover:bg-gray-500"
-                                ."hover:animate-pulse"
-                            {
-                                "Contact"
-                            }
-                        }
+                        }))
+                        (small_viewport_icon("Contact", "", "", "", ""))
                     }
                 }
             }

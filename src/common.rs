@@ -1,6 +1,14 @@
 use maud::{html, Markup, Render, DOCTYPE};
 
-use crate::routes::ROUTING;
+use crate::routes::{ROUTING, small_viewport_nav};
+
+pub fn standard(main: impl Render, route_index: usize) -> Markup {
+    head(body(header(route_index), main, footer(route_index), ""))
+}
+
+pub fn headless(main: impl Render, route_index: usize) -> Markup {
+    body(header(route_index), main, footer(route_index), "")
+}
 
 fn head(body: impl Render) -> Markup {
     html! {
@@ -10,7 +18,6 @@ fn head(body: impl Render) -> Markup {
             meta charset="UTF-8";
             meta name="viewport" content="width=device-width, initial-scale=1";
             link rel="stylesheet" href="static/tw.css" {}
-            link rel="stylesheet" href="static/htmx.css" {}
             link rel="icon" type="image/x-icon" href="static/favicon.png" {}
             link rel="preload" as="image" href="static/logo.svg" {}
             script src="static/htmx.js" {}
@@ -27,7 +34,7 @@ fn body(
     eob_slot: impl Render,
 ) -> Markup {
     html! {
-        body ."bg-gray-100 font-mono leading-6"
+        body ."bg-gray-100 font-mono leading-6 min-h-screen"
             hx-boost="true"
         {
             (header)
@@ -42,39 +49,41 @@ fn body(
 
 pub fn header(route_index: usize) -> Markup {
     html! {
-        header ."bg-gray-300 min-w-full text-m grid grid-flow-col flex flex-cols" {
+        header ."bg-gray-300 min-w-full text-m grid grid-flow-col flex flex-cols content-center" {
             ."flex flex-rows" {
-                a href="/" { img ."m-2 h-17 w-17" src="static/logo.svg" {} }
-                h1 ."py-10 pl-4" { "MFL Tutoring Services" }
+                a href="/" ."min-[0px]:hidden md:block" { img ."m-2 h-17 w-17" src="static/logo.svg" {} }
+                a href="/" ."py-10 pl-4" { "MFL Tutoring Services" }
             }
-            (ROUTING.nav(Some(route_index)))
+            ."min-[0px]:hidden md:flex md:justify-self-end md:px-2" {
+                (ROUTING.nav(route_index))
+            }
+            ."md:hidden group justify-self-end mr-44" {
+                (small_viewport_nav())
+            }
         }
     }
 }
 
 pub fn footer(route_index: usize) -> Markup {
     html! {
-        footer ."bg-gray-300 absolute bottom-0 left-0 flex flex-rows min-w-full text-xs" {
-            ."w-[50%]" {
-                (ROUTING.map(route_index))
-            }
-            address ."w-[50%] text-center mt-8 bottom-0" {
-                a href="mailto:a@a.com" ."text-blue-400 underline before:no-underline"
-                    ."before:content-['📧_']" { "a@a.com" }
-                br;
-                a href="tel:+447777777777" ."text-blue-400 underline before:no-underline"
-                    ."before:content-['📞_']" { "(+44) 7777 777 777" }
+        footer ."bg-gray-300 absolute bottom-0 left-0 grid grid-flow-col min-w-full text-xs" {
+            (ROUTING.map(route_index))
+            ."justify-self-end self-end p-4" {
+                address ."min-w-full" {
+                    ul ."list-none" {
+                        li ."py-2" {
+                            a href="mailto:a@a.com" ."text-blue-600 underline before:no-underline"
+                                ."before:content-['📧_']" { "a@a.com" }
+                        }
+                        li ."py-2" {
+                            a href="tel:+447777777777" ."text-blue-600 underline before:no-underline"
+                                ."before:content-['📞_']" { "(+44) 7777 777 777" }
+                        }
+                    }
+                }
             }
         }
     }
-}
-
-pub fn standard(main: impl Render, route_index: usize) -> Markup {
-    head(body(header(route_index), main, footer(route_index), ""))
-}
-
-pub fn headless(main: impl Render, route_index: usize) -> Markup {
-    body(header(route_index), main, footer(route_index), "")
 }
 
 pub fn form() -> Markup {

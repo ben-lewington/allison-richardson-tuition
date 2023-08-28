@@ -3,6 +3,7 @@ mod common;
 mod modal;
 mod nav;
 mod routes;
+mod svg;
 
 use axum::{http::HeaderMap, routing::get, Router};
 use common::{headless, standard};
@@ -72,7 +73,7 @@ async fn main() {
                     if let Some(_) = headers.get("HX-Request") {
                         headless(
                             html! {
-                                section {
+                                section ."flex flex-auto" {
                                     (form())
                                 }
                             },
