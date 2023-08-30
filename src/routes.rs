@@ -1,4 +1,4 @@
-use maud::{Markup, html};
+use maud::{html, Markup};
 use once_cell::sync::Lazy;
 
 pub static ROUTING: Lazy<Route<'static, usize>> = Lazy::new(|| {
@@ -29,18 +29,20 @@ pub enum Route<'a, Idx> {
     Nested(RouteData<'a, Idx>, Vec<Route<'a, Idx>>),
 }
 
+impl<'a, Idx> Route<'a, Idx> {
+    pub fn home(&self) -> &RouteData<'a, Idx> {
+        let Self::Nested(h, _) = self else {
+            panic!("only one home page currently supported")
+        };
+        &h
+    }
+}
+
 impl<'a, Idx> RouteData<'a, Idx> {
     pub fn new(id: Idx, route: &'a str, label: &'a str) -> Self {
         RouteData { id, route, label }
     }
 }
-            // ."before:bottom-[50%]"
-            // ."before:left-[-1px]"
-            // ."before:content-['']"
-            // ."before:border-l"
-            // ."before:border-b"
-            // ."before:border-black"
-            //
 
 fn small_viewport_icon(
     lbl: &'static str,
@@ -79,11 +81,7 @@ fn small_viewport_icon(
                     ."inline-block"
                     ."px-2 py-1"
                     ."whitespace-nowrap"
-                    ."hover:transition"
-                    ."hover:ease-in"
-                    ."hover:duration-500"
-                    ."hover:bg-gray-400"
-                    ."hover:animate-pulse"
+                    ."bg-hover-pulse"
                 {
                     (lbl)
                 }
@@ -92,11 +90,11 @@ fn small_viewport_icon(
         }
     }
 }
-            // ."whitespace-nowrap rounded-md shadow-md ease-in transition duration-300 inline-block mx-2 "
-            // ."mt-8 px-4 py-2 border min-w-fit max-w-sm "
-                                    // ul ."absolute bg-transparent m-2 z-10 text-sm"
-                                    //     ."transition-opacity opacity-0 delay-0"
-                                    //     ."group-hover:opacity-100 group-hover:delay-300"
+// ."whitespace-nowrap rounded-md shadow-md ease-in transition duration-300 inline-block mx-2 "
+// ."mt-8 px-4 py-2 border min-w-fit max-w-sm "
+// ul ."absolute bg-transparent m-2 z-10 text-sm"
+//     ."transition-opacity opacity-0 delay-0"
+//     ."group-hover:opacity-100 group-hover:delay-300"
 
 pub fn small_viewport_nav() -> Markup {
     html! {

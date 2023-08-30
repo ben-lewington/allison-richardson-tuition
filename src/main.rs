@@ -1,16 +1,28 @@
 mod common;
-// mod middleware;
+mod middleware;
 mod modal;
 mod nav;
 mod routes;
 mod svg;
 
-use axum::{http::HeaderMap, routing::get, Router};
+use axum::{http::HeaderMap, routing::get, Router, response::IntoResponse};
 use common::{headless, standard};
 use maud::html;
+use middleware::HtmxRequest;
 use tower_http::services::ServeDir;
 
 use crate::common::form;
+
+fn handle_fragment(main: maud::Markup, boosted: bool, id: usize) -> impl IntoResponse {
+   (
+       hx_trigger_response_headers("navEvt", id),
+       if boosted {
+           main
+       } else {
+           standard(main, id)
+       }
+   )
+}
 
 #[tokio::main]
 async fn main() {
@@ -18,59 +30,41 @@ async fn main() {
         .nest_service("/static", ServeDir::new("static"))
         .route(
             "/",
-            get(|| async {
-                (
-                    hx_trigger_response_headers("navEvt", 0),
-                    standard(
-                        html! {
-                            section { "bumper with bg-image" }
-                            section { "what we offer" }
-                            section { "cards with offerings -> nice bg image" }
-                            section { "bumper with poncy quote" }
-                        },
-                        0,
-                    ),
-                )
+            get(|HtmxRequest(t): HtmxRequest| async move {
+                handle_fragment(html! {
+                    section {
+                        "Available Courses"
+                    }
+                }, t, 0)
             }),
         )
         .route(
             "/about",
-            get(|| async {
-                (
-                    hx_trigger_response_headers("navEvt", 1),
-                    standard(
-                        html! {
-                            section {
-                                "Allison Richardson"
-                            }
-                        },
-                        1,
-                    ),
-                )
+            get(|HtmxRequest(t): HtmxRequest| async move {
+                handle_fragment(
+                html! {
+                    section {
+                        "Allison Richardson"
+                    }
+                }, t, 1)
             }),
         )
         .route(
             "/courses",
-            get(|| async {
-                (
-                    hx_trigger_response_headers("navEvt", 2),
-                    standard(
-                        html! {
-                            section {
-                                "Available Courses"
-                            }
-                        },
-                        2,
-                    ),
-                )
-            }),
+            get(|HtmxRequest(t): HtmxRequest| async move {
+                handle_fragment(html! {
+                    section {
+                        "Available Courses"
+                    }
+                }, t, 2)
+            })
         )
         .route(
             "/contact",
-            get(|headers: HeaderMap| async move {
+            get(|HtmxRequest(t): HtmxRequest| async move {
                 (
                     hx_trigger_response_headers("navEvt", 3),
-                    if let Some(_) = headers.get("HX-Request") {
+                    if t {
                         headless(
                             html! {
                                 section ."flex flex-auto" {
