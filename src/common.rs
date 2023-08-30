@@ -1,13 +1,9 @@
 use maud::{html, Markup, Render, DOCTYPE};
 
-use crate::routes::{ROUTING, small_viewport_nav};
+use crate::routes::ROUTING;
 
 pub fn standard(main: impl Render, route_index: usize) -> Markup {
     head(body(header(), main, footer(route_index), ""))
-}
-
-pub fn headless(main: impl Render, route_index: usize) -> Markup {
-    body(header(), main, footer(route_index), "")
 }
 
 fn head(body: impl Render) -> Markup {
@@ -64,11 +60,11 @@ pub fn header() -> Markup {
                     home.htmx_anchor("py-10 pl-4", Some(&"MFL Tutoring Services"))
                 )
             }
-            ."min-[0px]:hidden md:flex md:justify-self-end md:px-2" {
+            ."min-[0px]:hidden md:flex md:justify-self-end md:px-2 mb-4" {
                 (ROUTING.nav())
             }
             ."md:hidden group justify-self-end mr-44" {
-                (small_viewport_nav())
+                (ROUTING.small_nav())
             }
         }
     }

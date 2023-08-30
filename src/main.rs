@@ -5,24 +5,13 @@ mod nav;
 mod routes;
 mod svg;
 
-use axum::{http::HeaderMap, routing::get, Router, response::IntoResponse};
-use common::{headless, standard};
+use axum::{http::HeaderMap, response::IntoResponse, routing::get, Router};
+use common::standard;
 use maud::html;
 use middleware::HtmxRequest;
 use tower_http::services::ServeDir;
 
 use crate::common::form;
-
-fn handle_fragment(main: maud::Markup, boosted: bool, id: usize) -> impl IntoResponse {
-   (
-       hx_trigger_response_headers("navEvt", id),
-       if boosted {
-           main
-       } else {
-           standard(main, id)
-       }
-   )
-}
 
 #[tokio::main]
 async fn main() {
@@ -31,33 +20,44 @@ async fn main() {
         .route(
             "/",
             get(|HtmxRequest(t): HtmxRequest| async move {
-                handle_fragment(html! {
-                    section {
-                        "Available Courses"
-                    }
-                }, t, 0)
+                handle_fragment(
+                    html! {
+                        section {
+                            "Home Page"
+                        }
+                    },
+                    t,
+                    0,
+                )
             }),
         )
         .route(
             "/about",
             get(|HtmxRequest(t): HtmxRequest| async move {
                 handle_fragment(
-                html! {
-                    section {
-                        "Allison Richardson"
-                    }
-                }, t, 1)
+                    html! {
+                        section {
+                            "Allison Richardson"
+                        }
+                    },
+                    t,
+                    1,
+                )
             }),
         )
         .route(
             "/courses",
             get(|HtmxRequest(t): HtmxRequest| async move {
-                handle_fragment(html! {
-                    section {
-                        "Available Courses"
-                    }
-                }, t, 2)
-            })
+                handle_fragment(
+                    html! {
+                        section {
+                            "Available Courses"
+                        }
+                    },
+                    t,
+                    2,
+                )
+            }),
         )
         .route(
             "/contact",
@@ -65,14 +65,11 @@ async fn main() {
                 (
                     hx_trigger_response_headers("navEvt", 3),
                     if t {
-                        headless(
-                            html! {
-                                section ."flex flex-auto" {
-                                    (form())
-                                }
-                            },
-                            3,
-                        )
+                        html! {
+                            section ."flex flex-auto" {
+                                (form())
+                            }
+                        }
                     } else {
                         standard(
                             html! {
@@ -112,4 +109,11 @@ fn hx_trigger_response_headers<'a>(event_name: &'a str, payload: usize) -> Heade
             .unwrap(),
     );
     h
+}
+
+fn handle_fragment(main: maud::Markup, boosted: bool, id: usize) -> impl IntoResponse {
+    (
+        hx_trigger_response_headers("navEvt", id),
+        if boosted { main } else { standard(main, id) },
+    )
 }

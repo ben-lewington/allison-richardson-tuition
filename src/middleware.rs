@@ -14,7 +14,3 @@ impl<S> FromRequestParts<S> for HtmxRequest {
         }
     }
 }
-
-//
-// request comes in -> routed appropriately -> partial constructed -> if not HX-Request, embed
-// partial in full page
