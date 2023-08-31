@@ -17,11 +17,8 @@ where
         inner: Option<&'a M>,
     ) -> Markup {
         html! {
-            span
-                .(span_style)
-            {
-                (self.htmx_anchor::<&'a str>(anchor_style, None))
-            }
+            span .(span_style)
+            { (self.htmx_anchor::<&'a str>(anchor_style, None)) }
             (inner.map(|m| m.render()).unwrap_or(html! {}))
         }
     }
@@ -202,6 +199,14 @@ where
                     }
                 }
             }
+        }
+    }
+
+    pub fn scalable_nav(&self) -> Markup {
+        html! {
+            nav
+                _="on navEvt:PostSettle(value) from body log 'Evt' + value"
+            {}
         }
     }
 }
