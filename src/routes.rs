@@ -1,5 +1,44 @@
 use once_cell::sync::Lazy;
 
+pub struct Nav<'a, Idx> {
+    id: Idx,
+    parent_id: Option<Idx>,
+    endpoint: &'a str,
+    label: &'a str,
+}
+
+fn static_nav() -> Vec<Nav<'static, usize>> {
+    const TBL: &'static str = r#"
+id,parent_id,endpoint,label
+0,null,/,Home
+1,0,/about,About Us
+2,0,/courses,Tuition Services
+3,2,/courses/french,French
+4,2,/courses/german,German
+5,0,/contact,Contact Us
+"#;
+
+    TBL.split_terminator('\n')
+        .map(|l| {
+            let mut row = l.split_terminator(',');
+            let id: usize = row.next().unwrap().parse().unwrap();
+            let parent_id: Option<usize> = match row.next().unwrap() {
+                "null" => None,
+                f => Some(f.parse().unwrap()),
+            };
+            let endpoint = row.next().unwrap();
+            let label = row.next().unwrap();
+
+            Nav {
+                id,
+                parent_id,
+                endpoint,
+                label,
+            }
+        })
+        .collect()
+}
+
 pub static ROUTING: Lazy<Route<'static, usize>> = Lazy::new(|| {
     Route::Nested(
         RouteData::new(0, "/", "Home"),

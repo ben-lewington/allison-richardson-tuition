@@ -1,0 +1,56 @@
+Combining Templates.
+
+If you have a template t: T1, you can produce a new one by the following:
+    - embedding within another element:
+        NodeType .(ambient_style) _=[script] $($attr_name=$attr_val),* {
+            (t)
+        }
+    - embedding with some other template t0: T2 within a element:
+        NodeType .(parent_style) _=[script] $($attr_name=$attr_val),* {
+            (t)
+            (t0)
+        }
+
+    html {
+        (head)
+        (body)
+    }
+
+    head {
+        (title)
+        (meta)
+        (styles)
+        (script)
+        (links)
+    }
+
+    body {
+        (header)
+        (main)
+        (footer)
+    }
+
+    struct DocResponse<'a, B> {
+        head: Option<DocHead<'a>>,
+        body: B,
+    }
+
+    struct DocHead<'c, 'a, M, L> {
+        title: &'a str,
+        meta: M,
+        styles: &'c [&'a str],
+        script: &'a str,
+        links: L,
+    }
+
+    enum DocBody<H, B> {
+        Fragment(B),
+        Headless(B),
+        Full(H, B),
+    }
+
+    trait DocComponent<'a, A> {
+        fn embed(&self, style: &'a str, script: Option<&'a str>, attrs: A) -> maud::Markup;
+    }
+
+

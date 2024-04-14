@@ -1,0 +1,12 @@
+version: '3.9'
+
+name: 'ar-web'
+
+services:
+  server:
+    build:
+      context: ..
+
+  db:
+    build:
+      dockerfile: db.Dockerfile

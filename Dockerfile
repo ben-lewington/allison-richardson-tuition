@@ -1,0 +1,42 @@
+FROM node:latest as build-css
+
+RUN yarn global add tailwindcss
+
+WORKDIR /build
+COPY src src
+COPY index.css tailwind.config.js ./
+
+RUN tailwindcss -c tailwind.config.js -i index.css -o tw.css
+
+FROM lukemathwalker/cargo-chef:latest-rust-1 AS chef
+
+WORKDIR /build
+
+FROM chef AS planner
+
+COPY . .
+
+RUN cargo chef prepare --recipe-path recipe.json
+
+FROM chef AS builder
+
+COPY --from=planner /build/recipe.json recipe.json
+
+# Build dependencies - this is the caching Docker layer!
+RUN cargo chef cook --release --recipe-path recipe.json
+
+# Build application
+COPY . .
+
+RUN cargo build --release --bin ar-web
+
+# We do not need the Rust toolchain to run the binary!
+FROM debian:buster-slim AS runtime
+
+WORKDIR /app
+
+COPY static static
+COPY --from=build-css /build/tw.css static/tw.css
+COPY --from=builder /build/target/release/ar-web ar-web
+
+ENTRYPOINT ["/app/ar-web"]

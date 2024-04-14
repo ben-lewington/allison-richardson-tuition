@@ -2,8 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
-main { opacity: 1; transition: opacity 1.5s ease-out; }
-main.htmx-added { opacity: 0; }
+body {
+    --webkit-font-smoothing: antialiased;
+    --moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings:
+        "cv11", "salt", "ss01", "ss03",
+        "cv01", "cv02", "cv03", "cv04",
+        "cv05", "cv06", "cv09", "cv10";
+}
+
+/* main { opacity: 1; transition: opacity 1.5s ease-out; } */
+/* main.htmx-added { opacity: 0; } */
 
 @layer components {
     .bg-default {

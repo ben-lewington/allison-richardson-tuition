@@ -70,7 +70,7 @@ where
         html! {
             ."flex group mr-12 mt-8" {
                 nav ."absolute justify-self-left" {
-                    ."p-2 rounded-md border group-hover:animate-pulse w-fit " { (crate::svg::menu()) }
+                    ."p-2 border group-hover:animate-pulse w-fit " { (crate::svg::menu()) }
                     (Self::small_nav_rec(rs, 0))
                 }
             }
@@ -78,13 +78,16 @@ where
     }
 
     fn map_rec(&self, depth: usize, route_index: Idx) -> Markup {
-        let span_style = format!("{} relative inline-block pt-2 pr-2", if depth > 0 {
-            "pl-8 before:absolute before:top-0 before:bottom-[50%] before:left-[-1px]
+        let span_style = format!(
+            "{} relative inline-block pt-2 pr-2",
+            if depth > 0 {
+                "pl-8 before:absolute before:top-0 before:bottom-[50%] before:left-[-1px]
             before:w-8 before:content-[''] before:border-black before:border-b before:border-l"
-        } else {
-            ""
-        });
-        let anchor_style = "relative top-[-2px] inline-block p-2 border whitespace-nowrap bg-hover-pulse bg-sitemap hover:bg-sitemap-light:";
+            } else {
+                ""
+            }
+        );
+        let anchor_style = "relative top-[-2px] inline-block px-2 py-1.5 border whitespace-nowrap bg-hover-pulse bg-button hover:bg-sitemap-light:";
         html! {
             @match self {
                 Route::Simple(rd) => {
@@ -110,9 +113,9 @@ where
 
     fn nav_rec(rs: &Vec<Route<'a, Idx>>, depth: usize) -> Markup {
         let anchor_style = if depth == 0 {
-            "whitespace-nowrap rounded-md shadow-md inline-block mx-2 mt-8 px-4 py-2 border min-w-fit max-w-sm bg-button bg-hover-pulse"
+            "whitespace-nowrap shadow-md inline-block mx-2 mt-8 px-4 py-2 border min-w-fit max-w-sm bg-button bg-hover-pulse"
         } else {
-            "block px-4 py-2 rounded-md border mb-2 bg-anchor shadow-xl bg-hover-pulse"
+            "block px-4 py-2 border mb-2 bg-anchor shadow-xl bg-hover-pulse"
         };
 
         let ul_style = if depth == 0 {
@@ -147,7 +150,8 @@ where
 
     fn small_nav_rec(rs: &Vec<Route<'a, Idx>>, depth: usize) -> Markup {
         let span_style = "relative inline-block pl-3 border-black before:absolute before:w-4 before:top-0 before:bottom-[0%] before:left-[-3px] before:content-[''] before:border-l before:border-b before:border-black";
-        let anchor_style = "relative border-b border-black inline-block px-2 whitespace-nowrap bg-hover-pulse";
+        let anchor_style =
+            "relative border-b border-black inline-block px-2 whitespace-nowrap bg-hover-pulse";
         if depth == 0 {
             return html! {
                 ul ."relative z-10 bg-transparent transition-opacity opacity-0 delay-0 left-[-3px] group-hover:opacity-100 group-hover:delay-300"
